@@ -7,35 +7,45 @@ mt = MeCab.Tagger("mecabrc")
 
 connect = MySQLdb.connect(unix_socket="/Applications/MAMP/tmp/mysql/mysql.sock",db="MiyamoriLab", host="localhost", user="root", passwd="root")
 cursor = connect.cursor()
-cursor.execute("select * from NewsArticle")
-result = cursor.fetchall()
-for row in result:
-	articleId = row[0]
-	content = str(row[3])
-	res = mt.parseToNode(content)
+
+def insertDatabase(articleId,title,wordDic):
+	sumWords = sum(wordDic.values())
+	m = max(wordDic.values())
+	for word in wordDic.keys():
+		count = wordDic[word]
+		tf = float(count)/sumWords
+		cursor.execute("select id from Noun where noun = \"%s\"" % word)
+		if len(cursor.fetchall()) == 0:
+			cursor.execute("insert into Noun(noun,sum) values (\"%s\",%d)"%(word,count))
+			connect.commit()	
+		else:
+			cursor.execute("update Noun set sum = sum + %d where noun = \"%s\""%(count,word))
+			connect.commit()
+		cursor.execute("select id from Noun where noun = \"%s\""%word)
+		result = cursor.fetchall()
+		cursor.execute("insert into News_Noun(newsArticleId,nounId,count,tf) values(%d,%d,%d,%e)"%(articleId,result[0][0],count,tf))
+		connect.commit()
+
+def nounExtraction(articleId,title,content):
+	targetText = title + content
+	wordDic = {}
+
+	res = mt.parseToNode(targetText)
 	while res:
 		arr = res.feature.split(",")
 		if arr[0] == "名詞":
-			print articleId
-			print res.surface
+			if res.surface in wordDic:
+				wordDic[res.surface] += 1
+			else:
+				wordDic[res.surface] = 1
 		res = res.next
-	# print "===== Hit! ====="
-	# print "id   -- " + str(row[0]).encode('utf-8')
-	# print "title-- " + str(row[1])
-	# print "genre-- " + str(row[2])
-	# print "main -- " + str(row[3])
+	insertDatabase(articleId,title,wordDic)
 
-
-# mt = MeCab.Tagger("mecabrc")
-# res = mt.parseToNode(text)
-
-# while res:
-# 	arr = res.feature.split(",")
-
-# 	if arr[0] == "名詞" or arr[0] == "動詞":
-# 		if res.surface in wordCount:
-# 			wordCount[res.surface] += 1
-# 		else:
-# 			wordCount[res.surface] = 1
-# 	res = res.next
-
+if __name__ == "__main__":
+	cursor.execute("select * from NewsArticle")
+	result = cursor.fetchall()
+	for row in result:
+		articleId = row[0]
+		title = str(row[1])
+		content = str(row[3])
+		nounExtraction(articleId,title,content)
