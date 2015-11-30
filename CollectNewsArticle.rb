@@ -1,6 +1,6 @@
 require 'nokogiri'
 require 'open-uri'
-require 'mysql2'
+# require 'mysql2'
 
 $baseurl = "http://news.yahoo.co.jp/hl"
 $articles = []
@@ -9,8 +9,8 @@ $articles = []
 
 def writeData()
 	#テーブル名
-	table_name = 'NewsArticle'
-	client = Mysql2::Client.new(:host => "localhost", :username => "root", :password => "root", :database => "MiyamoriLab",:socket => "/Applications/MAMP/tmp/mysql/mysql.sock",:port => "3360")
+	# table_name = 'NewsArticle'
+	# client = Mysql2::Client.new(:host => "localhost", :username => "root", :password => "root", :database => "MiyamoriLab",:socket => "/Applications/MAMP/tmp/mysql/mysql.sock",:port => "3360")
 
 	for article in $articles do
 		title = article["title"]
@@ -18,14 +18,14 @@ def writeData()
 		genre = article["genre"]
 
 		id = 0
-		client.query("SELECT id FROM #{table_name} WHERE title = '#{title}'").each do |col|
-			unless col.nil?
-				id=col["id"]
-			end
-		end
-		if id == 0
-			client.query("INSERT INTO #{table_name} (title,genre,content) VALUES ('#{title}','#{genre}','#{content}')")
-		end
+		# client.query("SELECT id FROM #{table_name} WHERE title = '#{title}'").each do |col|
+		# 	unless col.nil?
+		# 		id=col["id"]
+		# 	end
+		# end
+		# if id == 0
+		# 	# client.query("INSERT INTO #{table_name} (title,genre,content) VALUES ('#{title}','#{genre}','#{content}')")
+		# end
 	end
 
 end
