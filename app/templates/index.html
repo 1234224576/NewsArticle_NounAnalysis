@@ -56,31 +56,30 @@ and open the template in the editor.
 
 			<div class="page-header">
 				<h1>Q2　　<small>与えられたクエリにマッチした文書をtf-idfでランキング</small></h1>
-				<div class="col-md-6">
-                    <div class="navbar-form" style="margin-bottom: 80px;">
-                		<div class="form-group">
-                 	   		<input type="text" name="keyword" class="form-control" id="searchKeyword" placeholder="検索キーワード" pattern="^[a-zA-Z0-9ぁ-んァ-ン一-龥_-].*" min="1" size="50">
-                		</div>
-                		<button id="searchButton" class="btn btn-default">検索</button>
-            		</div>
+				<div class="col-md-12">
+          <div class="navbar-form" style="margin-bottom: 80px;">
+          <div class="form-group">
+            <input type="text" name="keyword" class="form-control" id="searchKeyword" placeholder="検索キーワード" pattern="^[a-zA-Z0-9ぁ-んァ-ン一-龥_-].*" min="1" size="50">
+          </div>
+            <button id="searchButton" class="btn btn-default">検索</button>
+          </div>
 
-            		<div id="loading" style="margin-left: 15px">
-                		<img src="/static/img/gif-load.gif" width="30">
-                		<p style="margin-top: -25px;margin-left: 40px;">通信中...</p>
-                	</div>
+          <div id="loading" style="margin-left: 15px">
+            <img src="/static/img/gif-load.gif" width="30">
+            <p style="margin-top: -25px;margin-left: 40px;">通信中...</p>
+          </div>
+          <div class="col-md-12">
+            <a class="btn btn-default" id="hitArticleButton" data-toggle="collapse" href="#collapse"></a>
+            <div class="collapse" id="collapse">
+              <div id="hitArticle" class="well"></div>
+            </div>
+          </div>
 
-                	<div id="result" style="margin-top: -60px;margin-left: 14px;">
-                		<a class="btn btn-default" id="hitArticleButton" data-toggle="collapse" href="#collapse"></a>
-						<div class="collapse" id="collapse">
-							<div id="hitArticle" class="well">
-							</div>
-						</div>
-						<svg id="tfidf_graph" class="q2_graph" style="margin-top: 30px;"></svg>
-						<div style = "margin-top:-30px">
-							<button id="back">前へ</button>
-							<button id="next">次へ</button>
-						</div>
-                	</div>
+          <svg id="tfidf_graph" class="q2_graph" style="margin-top: 30px;"></svg>
+          <div style = "margin-top:-30px">
+            <button id="back">前へ</button>
+            <button id="next">次へ</button>
+          </div>
 				</div>
 			</div>
 		</div>

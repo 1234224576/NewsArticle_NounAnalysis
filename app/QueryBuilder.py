@@ -28,10 +28,17 @@ class QueryBuilder:
 		# NewsArticle.content LIKE  \"%s\" OR NewsArticle.title LIKE  \"%s\" ORDER BY News_Noun.tfidf DESC"""%(key,key)
 
 	def getSearchTfidfRank(self,keys):
-		query = """SELECT DISTINCT NewsArticle.title,NewsArticle.content,NewsArticle.genre,Noun.noun,News_Noun.tfidf
+		query = """SELECT DISTINCT NewsArticle.id,NewsArticle.title,NewsArticle.content,NewsArticle.genre,Noun.noun,News_Noun.tfidf
 		FROM (NewsArticle JOIN News_Noun
 		ON NewsArticle.id = News_Noun.newsArticleId)
 		INNER JOIN Noun ON News_Noun.nounId = Noun.id """
 		query += self.appendWhere(keys)
-		print query
+		return query
+
+	def getScore(self,articleId,keyword):
+		query = """SELECT News_Noun.tfidf
+		FROM (NewsArticle JOIN News_Noun
+		ON NewsArticle.id = News_Noun.newsArticleId)
+		INNER JOIN Noun ON News_Noun.nounId = Noun.id
+		WHERE Noun.noun = \"%s\" AND NewsArticle.id = %d """%(keyword,articleId)
 		return query

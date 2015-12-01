@@ -1,6 +1,7 @@
 window.onload = function(){
 	$('#loading').hide();
 	$('#result').hide();
+	$('#hitArticleButton').hide();
 
 	var offsetX = 40;
 	var offsetY = 20;
@@ -10,7 +11,7 @@ window.onload = function(){
 	var xScale = d3.scale.log()
 	    .domain([1,7674])
 	    .range([0,width]);
- 
+
 	var yScale = d3.scale.log()
         .domain([1000,1])
         .range([0,height]);
@@ -78,28 +79,38 @@ window.onload = function(){
             success: function(res){
             	start = 0;
             	tfidfData = res;
-            	$('#hitArticle').html(makeHtmlWithHitArticleData(res));
             	drawTfidfRankingGraph(tfidfData,start)
             	$('#loading').hide();
-				$('#result').show();
+							$('#result').show();
+            }
+        });
+				$.ajax({
+            type: "GET",
+            url: "http://127.0.0.1:5000/pagerank?keyword="+$('#searchKeyword').val(),
+            dataType: "json",
+            success: function(res){
+							$('#hitArticleButton').show();
+
+            	$('#hitArticle').html(makeHtmlWithHitArticleData(res));
             }
         });
     });
 
     function makeHtmlWithHitArticleData(res){
-    	var html = "";
-    	var article = {};
+    	var html = '<table class="table">';
+			html += '<thead>';
+			html += '<tr><th>順位</th><th>記事名</th><th>スコア</th>';
+			html += '</thead>';
+			html += '<tbody>';
     	for(var i=0;i<res.length;i++){
-    		if(!(res[i]["title"] in article)){
-    			article[res[i]["title"]] = res[i]["content"];
-     		}
+					html += "<tr>"
+					html += "<th>" + (i+1) + "</th>";
+					html += "<th>" + res[i]["title"] + "</th>";
+					html += "<th>" + res[i]["score"] + "</th>";
+	    		html += "</tr>";
     	}
-    	for (var key in article) {
-		 	 html += "<p>";
-    		html += key;
-    		html += "</p>";
-		}
-		$("#hitArticleButton").html("ヒットした記事（"+Object.keys(article).length+"件）")
+			html += '</tbody></table>';
+			$("#hitArticleButton").html("ヒットした記事（"+res.length+"件）")
     	return html;
     }
 
@@ -171,5 +182,3 @@ window.onload = function(){
 		return selectData;
 	}
 }
-
-

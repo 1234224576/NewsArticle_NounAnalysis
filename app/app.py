@@ -2,6 +2,8 @@
 from flask import Flask,render_template,Response, json,request
 from flask.ext.mysqldb import MySQL
 import QueryBuilder as qb
+import collections
+
 mysql = MySQL()
 app = Flask(__name__)
 app.config['MYSQL_USER'] = 'root'
@@ -41,16 +43,44 @@ def tfidfrank():
 	if len(keys) != 0:
 		cur.execute(unicode(query.getSearchTfidfRank(keys)))
 		rv = cur.fetchall()
-		data = [{"title":r[0],"content":r[1],"genre":r[2],"noun":r[3],"tfidf":r[4]} for r in rv]
+		data = [{"title":r[1],"content":r[2],"genre":r[3],"noun":r[4],"tfidf":r[5]} for r in rv]
 	else:
 		data = []
 	js = json.dumps(data)
 	resp = Response(js, status=200, mimetype='application/json')
 	return resp
 
-# @app.route('/pagerank', methods = ['GET'])
-# def pageRank():
-#
+@app.route('/pagerank', methods = ['GET'])
+def pageRank():
+	keys = request.args.get("keyword").split(" ")
+	cur = mysql.connection.cursor()
+	if len(keys) != 0:
+		cur.execute(unicode(query.getSearchTfidfRank(keys)))
+		rv = cur.fetchall()
+
+		hitTitles = {}
+		# for r in rv:
+		# 	hitTitles["title"] = r[0]
+		#
+
+		for r in rv:
+			score = 0
+			for key in keys:
+				cur.execute(unicode(query.getScore(r[0],key)))
+				for s in cur.fetchall():
+					score += s[0]
+			hitTitles[r[1]] = score
+
+		hitTitles =	collections.OrderedDict(sorted(hitTitles.items(), key=lambda x:x[1],reverse=True))
+
+		data = [{"title":k,"score":v} for k,v in hitTitles.items()]
+	else:
+		data = []
+	js = json.dumps(data)
+	resp = Response(js, status=200, mimetype='application/json')
+	return resp
+
+
 
 
 
