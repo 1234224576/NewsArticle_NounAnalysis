@@ -16,7 +16,6 @@ query = qb.QueryBuilder()
 
 @app.route("/")
 def index():
-
 	return render_template('index.html')
 
 #http://127.0.0.1:5000/frequencyrank
@@ -49,8 +48,12 @@ def tfidfrank():
 	resp = Response(js, status=200, mimetype='application/json')
 	return resp
 
+# @app.route('/pagerank', methods = ['GET'])
+# def pageRank():
+#
+
+
+
 if __name__ == "__main__":
 	app.debug = True
 	app.run()
-
-
